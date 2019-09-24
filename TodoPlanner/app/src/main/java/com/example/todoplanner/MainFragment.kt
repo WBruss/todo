@@ -7,6 +7,8 @@ import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.ImageView
+import android.widget.Toast
 import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.ViewModelProviders
@@ -21,7 +23,9 @@ import java.lang.Exception
 /**
  * A simple [Fragment] subclass.
  */
-class MainFragment : Fragment(), View.OnClickListener {
+class MainFragment : Fragment(), View.OnClickListener, TodoAdapter.OnTodoClickListener {
+
+
 
 //        private var todoList = mutableListOf<ToDo>(
 //            ToDo("Grocery1", "By groceries on the way home", "19/2/2019"),
@@ -31,10 +35,18 @@ class MainFragment : Fragment(), View.OnClickListener {
 
     val TAG = "Main Fragment Todo"
 
+    lateinit var todoAdapter: TodoAdapter
+
     var navController: NavController? = null
     lateinit var newTodo: ToDo
+    var position: Int = 0
+    lateinit var todo: ToDo
 
     lateinit var todoViewModel: TodoViewModel
+
+    override fun onTodoClick(int: Int) {
+        position = int
+    }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -52,13 +64,19 @@ class MainFragment : Fragment(), View.OnClickListener {
         }?: throw Exception("Invalid Activity")
 
         val todoRecycler: RecyclerView = view.findViewById(R.id.todo_recycler_view)
-        val todoAdapter = TodoAdapter(container!!.context)
+        todoAdapter = TodoAdapter(container!!.context)
         todoRecycler.adapter = todoAdapter
         todoRecycler.layoutManager = LinearLayoutManager(activity)
 
-        todoViewModel.allTodos.observe(this, Observer {
-            todoAdapter.submitList(it)
+        todoViewModel.allTodos.observe(this, Observer { todo ->
+            todoAdapter.submitList(todo)
+
+            todoAdapter.deleteButton().setOnClickListener {
+                todoViewModel.delete(todo[position])
+            }
         })
+
+
 
         return view
     }
@@ -67,6 +85,7 @@ class MainFragment : Fragment(), View.OnClickListener {
         super.onViewCreated(view, savedInstanceState)
         navController = Navigation.findNavController(view)
         view.findViewById<FloatingActionButton>(R.id.btn_create_todo).setOnClickListener(this)
+
     }
 
     override fun onClick(v: View?) {
@@ -74,7 +93,6 @@ class MainFragment : Fragment(), View.OnClickListener {
             R.id.btn_create_todo -> navController!!.navigate(R.id.action_mainFragment_to_createTodo)
         }
     }
-
 
 
 

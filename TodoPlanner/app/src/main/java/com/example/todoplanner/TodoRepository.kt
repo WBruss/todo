@@ -9,4 +9,8 @@ class TodoRepository(private val todoDAO: TodoDAO) {
     suspend fun insert(toDo: ToDo){
         todoDAO.insert(toDo)
     }
+
+    suspend fun delete(toDo: ToDo){
+        todoDAO.delete(toDo)
+    }
 }

@@ -32,4 +32,9 @@ class TodoViewModel(application: Application) : AndroidViewModel(application) {
     fun insert(todo: ToDo)= viewModelScope.launch {
         repository.insert(todo)
     }
+
+    fun delete(todo: ToDo) = viewModelScope.launch {
+
+        repository.delete(todo)
+    }
 }
