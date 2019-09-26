@@ -3,6 +3,7 @@ package com.example.todoplanner
 import android.content.Context
 import android.util.Log
 import android.view.LayoutInflater
+import android.view.View
 import android.view.ViewGroup
 import android.widget.ImageView
 import androidx.recyclerview.widget.ListAdapter
@@ -17,39 +18,41 @@ class TodoAdapter(context: Context) : ListAdapter<ToDo, TodoViewHolder>(MCallBac
 
     private val inflater: LayoutInflater = LayoutInflater.from(context)
 
-    lateinit var btn: ToDo
-
-    var deleteCond: Boolean = false
-
     lateinit var button: ImageView
 
+    lateinit var todoClick: OnTodoClickListener
+
+
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): TodoViewHolder {
-        val holder = TodoViewHolder(inflater.inflate(R.layout.item_todo, parent, false))
+        val holder = TodoViewHolder((inflater.inflate(R.layout.item_todo, parent, false)))
         return holder
     }
 
     override fun onBindViewHolder(holder: TodoViewHolder, position: Int) {
-        holder.bind(getItem(position))
-        button = holder.btnDelete()
-        deleteCond = holder.delete
-
+        holder.bind(getItem(position), todoClick)
         Log.i(TAG, getItem(position).title)
-    }
 
-    fun deleteButton(): ImageView{
-        return button
-    }
-
-    fun getTodoToDelete(): ToDo{
-        return btn
-    }
-
-
-    fun getDelete(): Boolean{
-        return deleteCond
     }
 
     interface OnTodoClickListener{
-        fun onTodoClick(int: Int)
+        fun onTodoClick(position: Int)
+    }
+
+//    override fun getItemCount(): Int {
+//        return super.getItemCount()
+//    }
+//
+    fun getTodoAt(position: Int): ToDo{
+        return getItem(position)
+    }
+//
+//    fun deleteButton(): ImageView{
+//        return button
+//    }
+//
+
+
+    fun setOnTodoClickListener(todoClickListener: OnTodoClickListener){
+        todoClick = todoClickListener
     }
 }

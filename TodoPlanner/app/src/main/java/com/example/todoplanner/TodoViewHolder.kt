@@ -12,21 +12,33 @@ import java.text.FieldPosition
 
 class TodoViewHolder(val view: View) : RecyclerView.ViewHolder(view) {
 
+
     private var TAG = "TodoView Holder"
 
     lateinit var todo: ToDo
 
-
-
-    fun bind( todo: ToDo){
+    fun bind( todo: ToDo, listener: TodoAdapter.OnTodoClickListener){
         view.findViewById<TextView>(R.id.text_title).text = todo.title
-        Log.i(TAG, todo.title)
         view.findViewById<TextView>(R.id.text_description).text = todo.description
         view.findViewById<TextView>(R.id.text_date).text = todo.date
-        view.findViewById<ImageView>(R.id.btn_delete).setOnClickListener{
-
+        view.findViewById<ImageView>(R.id.btn_delete).setOnClickListener {
+            println("Buttton found" )
+            var position = adapterPosition
+            listener.onTodoClick(position)
         }
+
     }
 
+    fun deleteTodoItem(action: OnTodoDeleteListener){
+        if(view.findViewById<ImageView>(R.id.btn_delete) == null){
+            println("Button ,missing")
+        }else{
 
+        }
+
+
+    }
+    interface OnTodoDeleteListener{
+        fun deleteTodo()
+    }
 }

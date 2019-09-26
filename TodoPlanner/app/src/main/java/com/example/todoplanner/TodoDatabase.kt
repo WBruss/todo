@@ -14,24 +14,24 @@ abstract class TodoDatabase: RoomDatabase() {
 
     abstract fun todoDAO(): TodoDAO
 
-    private class TodoDatabaseCallback(
-        private val scope: CoroutineScope): RoomDatabase.Callback(){
-
-        override fun onOpen(db: SupportSQLiteDatabase) {
-            super.onOpen(db)
-            INSTANCE?.let{ database -> scope.launch {
-                var todoDAO = database.todoDAO()
-
-                var todo = ToDo("Grocery1", "By groceries on the way home", "19/2/2019")
-                todoDAO.insert(todo)
-                todo = ToDo("Grocery2", "By groceries on the way home", "20/2/2019")
-                todoDAO.insert(todo)
-                todo = ToDo("Grocery3", "By groceries on the way home", "23/2/2019")
-                todoDAO.insert(todo)
-            }
-            }
-        }
-    }
+//    private class TodoDatabaseCallback(
+//        private val scope: CoroutineScope): RoomDatabase.Callback(){
+//
+//        override fun onOpen(db: SupportSQLiteDatabase) {
+//            super.onOpen(db)
+//            INSTANCE?.let{ database -> scope.launch {
+//                var todoDAO = database.todoDAO()
+//
+//                var todo = ToDo("Grocery1", "By groceries on the way home", "19/2/2019")
+//                todoDAO.insert(todo)
+//                todo = ToDo("Grocery2", "By groceries on the way home", "20/2/2019")
+//                todoDAO.insert(todo)
+//                todo = ToDo("Grocery3", "By groceries on the way home", "23/2/2019")
+//                todoDAO.insert(todo)
+//            }
+//            }
+//        }
+//    }
 
     companion object{
         @Volatile
@@ -48,7 +48,8 @@ abstract class TodoDatabase: RoomDatabase() {
                     context.applicationContext,
                     TodoDatabase::class.java,
                     "TodoDatabase"
-                ).addCallback(TodoDatabaseCallback(scope))
+                )
+//                    .addCallback(TodoDatabaseCallback(scope))
                     .build()
                 INSTANCE = instance
                 return instance

@@ -14,8 +14,10 @@ import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.ViewModelProviders
 import androidx.navigation.NavController
 import androidx.navigation.Navigation
+import androidx.recyclerview.widget.ItemTouchHelper
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
+import com.example.todoplanner.TodoAdapter.OnTodoClickListener
 import com.google.android.material.floatingactionbutton.FloatingActionButton
 import kotlinx.android.synthetic.main.fragment_main.*
 import java.lang.Exception
@@ -23,7 +25,7 @@ import java.lang.Exception
 /**
  * A simple [Fragment] subclass.
  */
-class MainFragment : Fragment(), View.OnClickListener, TodoAdapter.OnTodoClickListener {
+class MainFragment : Fragment(), View.OnClickListener {
 
 
 
@@ -44,9 +46,10 @@ class MainFragment : Fragment(), View.OnClickListener, TodoAdapter.OnTodoClickLi
 
     lateinit var todoViewModel: TodoViewModel
 
-    override fun onTodoClick(int: Int) {
-        position = int
-    }
+    lateinit var todoRecycler: RecyclerView
+
+    lateinit var todoViewHolder: TodoViewHolder
+
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -63,22 +66,53 @@ class MainFragment : Fragment(), View.OnClickListener, TodoAdapter.OnTodoClickLi
             ViewModelProviders.of(this)[TodoViewModel::class.java]
         }?: throw Exception("Invalid Activity")
 
-        val todoRecycler: RecyclerView = view.findViewById(R.id.todo_recycler_view)
+        todoRecycler = view.findViewById(R.id.todo_recycler_view)
         todoAdapter = TodoAdapter(container!!.context)
         todoRecycler.adapter = todoAdapter
         todoRecycler.layoutManager = LinearLayoutManager(activity)
 
         todoViewModel.allTodos.observe(this, Observer { todo ->
             todoAdapter.submitList(todo)
+        })
 
-            todoAdapter.deleteButton().setOnClickListener {
-                todoViewModel.delete(todo[position])
+        setRecyclerViewItemTouchListener()
+
+        todoViewHolder = TodoViewHolder(view)
+//        todoViewHolder.deleteTodoItem(object : TodoViewHolder.OnTodoDeleteListener{
+////            override fun deleteTodo() {
+////                todoViewModel.delete(todoAdapter.getTodoAt(todoViewHolder.adapterPosition))
+////            }
+////
+////        })
+
+        todoAdapter.setOnTodoClickListener(object : OnTodoClickListener{
+            override fun onTodoClick(position: Int) {
+                todoViewModel.delete(todoAdapter.getTodoAt(position))
             }
         })
 
-
-
         return view
+    }
+
+    private fun setRecyclerViewItemTouchListener(){
+        val itemTouchCallback = object : ItemTouchHelper.SimpleCallback(0,
+            ItemTouchHelper.LEFT){
+            override fun onMove(
+                recyclerView: RecyclerView,
+                viewHolder: RecyclerView.ViewHolder,
+                target: RecyclerView.ViewHolder
+            ): Boolean {
+                return false
+            }
+
+            override fun onSwiped(viewHolder: RecyclerView.ViewHolder, direction: Int) {
+                val position = viewHolder.adapterPosition
+                todoViewModel.delete(todoAdapter.getTodoAt(position))
+                Toast.makeText(activity, "Todo Deleted", Toast.LENGTH_LONG).show()
+            }
+        }
+        val itemTouchHelper = ItemTouchHelper(itemTouchCallback)
+        itemTouchHelper.attachToRecyclerView(todoRecycler)
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
